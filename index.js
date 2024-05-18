@@ -5,6 +5,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors()); // Use cors as middleware
+app.use(express.json()); // Use express.json() middleware to parse JSON request bodies
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
@@ -24,6 +25,28 @@ app.get("/secret", (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       res.json(rows);
+    },
+  });
+});
+
+// Endpoint to add credentials
+app.post("/secret", (req, res) => {
+  // Get the data from the request body
+  const { Website, Username, Password } = req.body;
+  console.log(Website, Username, Password);
+
+  // Create the SQL query
+  const sqlQuery = `INSERT INTO WEBSITE.PUBLIC.CREDENTIALS (website, username, password) VALUES ('${Website}', '${Username}', '${Password}')`;
+
+  // Execute the query
+  connection.execute({
+    sqlText: sqlQuery,
+    complete: function (err, stmt, rows) {
+      if (err) {
+        console.error("Failed to execute query: ", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ message: "Data inserted successfully" });
     },
   });
 });
