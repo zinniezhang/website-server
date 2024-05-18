@@ -8,15 +8,13 @@ app.use(cors()); // Use cors as middleware
 app.use(express.json()); // Use express.json() middleware to parse JSON request bodies
 
 app.get("/", (req, res) => {
-  res.send("Hello, World!");
+  res.send("API Documentation for www.zinniezhang.com");
 });
 
-// Endpoint to get credentials
+// Get credentials
 app.get("/secret", (req, res) => {
-  // Assuming you have a specific SQL query to execute
-  const sqlQuery = "SELECT * FROM WEBSITE.PUBLIC.CREDENTIALS";
+  const sqlQuery = "SELECT * FROM WEBSITE.PUBLIC.SECRET";
 
-  // Execute a query
   connection.execute({
     sqlText: sqlQuery,
     complete: function (err, stmt, rows) {
@@ -29,16 +27,11 @@ app.get("/secret", (req, res) => {
   });
 });
 
-// Endpoint to add credentials
+// Insert credentials
 app.post("/secret", (req, res) => {
-  // Get the data from the request body
   const { Website, Username, Password } = req.body;
-  console.log(Website, Username, Password);
+  const sqlQuery = `INSERT INTO WEBSITE.PUBLIC.SECRET (website, username, password) VALUES ('${Website}', '${Username}', '${Password}')`;
 
-  // Create the SQL query
-  const sqlQuery = `INSERT INTO WEBSITE.PUBLIC.CREDENTIALS (website, username, password) VALUES ('${Website}', '${Username}', '${Password}')`;
-
-  // Execute the query
   connection.execute({
     sqlText: sqlQuery,
     complete: function (err, stmt, rows) {
@@ -47,6 +40,23 @@ app.post("/secret", (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       res.status(201).json({ message: "Data inserted successfully" });
+    },
+  });
+});
+
+// Delete credentials
+app.delete("/secret", (req, res) => {
+  const { Website } = req.body;
+  const sqlQuery = `DELETE FROM WEBSITE.PUBLIC.SECRET WHERE website = '${Website}'`;
+
+  connection.execute({
+    sqlText: sqlQuery,
+    complete: function (err, stmt, rows) {
+      if (err) {
+        console.error("Failed to execute query: ", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(200).json({ message: "Data deleted successfully" });
     },
   });
 });
