@@ -1,7 +1,10 @@
 const express = require("express");
+const cors = require("cors"); // Import cors module
 const connection = require("./db.js");
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors()); // Use cors as middleware
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
